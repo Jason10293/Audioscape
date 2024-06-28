@@ -1,3 +1,0 @@
-CLIENT_ID = "965f62b7fdcd46dda7fddfc3c05767b2"
-CLIENT_SECRET = "e03034e30c474083a4c0cbda62d80eb9"
-REDIRECT_URL = "http://localhost:3000"
