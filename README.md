@@ -26,7 +26,7 @@ This Python script is designed to interact with the Spotify API to analyze and r
 # Optimizations
 - **Less API calls**: Instead of calling the Spotify API for every track I instead used a batch request, requesting the information of 100 songs or artists at a time thus reducing the number of API calls made. This change made the algorithm output the recommended songs more than 10x faster
 - **Songs recently added have weight:** Recognizing that long playlists may contain older songs that don't accurately reflect a user's current taste, I implemented a feature that gives more weight to recently added songs when calculating the overall playlist vector. This ensures recommendations are aligned with the user's evolving musical preferences.
--** Term Frequency - Inverse Document Frequency (tf-idf)**: tf-idf in essence transforms text (track genres) into a numerical that can be interpreted by cosine similarity. a high tf-idf suggests that a track genre is a distinguishing track genre and would make sense that is should be more likely to appear in genre recommendation
+- **Term Frequency - Inverse Document Frequency (tf-idf)**: tf-idf in essence transforms text (track genres) into a numerical that can be interpreted by cosine similarity. a high tf-idf suggests that a track genre is a distinguishing track genre and would make sense that is should be more likely to appear in genre recommendation
 
   <img src="https://github.com/Jason10293/Audioscape/assets/66051354/912a9327-affd-4477-b9af-f3185d7d1365" width="600" height="400"/>
 
