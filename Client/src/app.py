@@ -13,7 +13,7 @@ load_dotenv('API_Keys.env')
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
-API_BASE_URL = 'https://api.spotify.com/v1'
+API_BASE_URL = 'https://api.spotify.com/v1/'
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
@@ -26,7 +26,7 @@ def index():
 
 @app.route('/login')
 def login():
-    scope = 'user-read-private user-read-email'
+    scope = 'user-read-private user-read-email playlist-read-private playlist-read-collaborative'  
     params = {
         'client_id': os.environ.get('CLIENT_ID'),
         'response_type': 'code', 
@@ -48,7 +48,7 @@ def callback():
         req_body = {
             'code': request.args['code'],
             'grant_type': 'authorization_code',
-            'redirect_uri': os.environ.get('REDIRECT_URL'),
+            'redirect_uri': os.environ.get('REDIRECT_URI'),
             'client_id': os.environ.get('CLIENT_ID'),
             'client_secret': os.environ.get('CLIENT_SECRET')
         }
@@ -56,15 +56,13 @@ def callback():
     response = requests.post(TOKEN_URL, data = req_body)
     token_info = response.json()
 
-    token_info = response.json()
-
     session['access_token'] = token_info['access_token']
     session['refresh_token'] = token_info['refresh_token']
     session['expires_at'] = datetime.now().timestamp() + token_info['expires_in']
-
+    print(f"access token: {session['access_token']}")
     return redirect('/playlists')
 
-@app.route('/playlist')
+@app.route('/playlists')
 def get_playlists():
     if 'access_token' not in session:
         return redirect('/login')
