@@ -8,8 +8,9 @@ from flask import Flask, jsonify, request, redirect, session, url_for
 from flask_cors import CORS
 from authlib.integrations.flask_client import OAuth
 import urllib.parse
+import json
 
-load_dotenv('API_Keys.env')
+load_dotenv('API_keys.env')
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
@@ -59,8 +60,13 @@ def callback():
     session['access_token'] = token_info['access_token']
     session['refresh_token'] = token_info['refresh_token']
     session['expires_at'] = datetime.now().timestamp() + token_info['expires_in']
-    print(f"access token: {session['access_token']}")
+
+    
+
     return redirect('/playlists')
+
+    
+
 
 @app.route('/playlists')
 def get_playlists():
@@ -76,6 +82,9 @@ def get_playlists():
 
     response = requests.get(API_BASE_URL + 'me/playlists', headers=headers)
     playlists = response.json()
+
+    with open('Server/user_playlists.json', 'w') as outfile:
+        json.dump(playlists, outfile)
 
     return jsonify(playlists)
 

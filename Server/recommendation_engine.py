@@ -1,20 +1,30 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from Secrets import CLIENT_ID, CLIENT_SECRET, REDIRECT_URL
 import pandas as pd
 import numpy as np
+from dotenv import load_dotenv
+import os
+import json
 from sklearn.preprocessing import MinMaxScaler
 from dateutil.relativedelta import relativedelta
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+load_dotenv('API_keys.env')
+
+with open('Server/user_playlists.json', 'r') as infile:
+    playlists = json.load(infile)
+
+for item in playlists['items']:
+    print(item['id'])
+
 # Initialize the Spotify client with OAuth for accessing user library
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=CLIENT_ID,
-                                            client_secret=CLIENT_SECRET,
-                                            redirect_uri=REDIRECT_URL,
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ.get('CLIENT_ID'),
+                                            client_secret=os.environ.get('CLIENT_SECRET'),
+                                            redirect_uri=os.environ.get('REDIRECT_URI'),
                                             scope="user-library-read"))
 
-df = pd.read_csv('./dataset.csv')
+df = pd.read_csv('Server/dataset.csv')
 df = df[df.columns[1:]]
 df = df.drop(columns=['time_signature', 'duration_ms'])
 

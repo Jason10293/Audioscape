@@ -4,7 +4,6 @@ export default function App() {
     <div>
       <h1>My Spotify Playlist App</h1>
       <SpotifyAuth />
-      {/* Other components and content */}
     </div>
   );
 }
