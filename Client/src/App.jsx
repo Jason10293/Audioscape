@@ -1,9 +1,13 @@
 import SpotifyAuth from "./SpotifyAuth";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import PlaylistSelection from "./PlaylistSelection";
 export default function App() {
   return (
-    <div>
-      <h1>My Spotify Playlist App</h1>
-      <SpotifyAuth />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<SpotifyAuth />} />
+        <Route path="/PlaylistSelection" element={<PlaylistSelection />} />
+      </Routes>
+    </Router>
   );
 }

@@ -1,0 +1,184 @@
+{
+  "href": "https://api.spotify.com/v1/users/r8j075ng16rqu6u7olud5uxr8/playlists?offset=0&limit=50",
+  "limit": 50,
+  "next": null,
+  "offset": 0,
+  "previous": null,
+  "total": 4,
+  "items": [
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2zx3OZLsEhIcPZ5cmH9WtS"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2zx3OZLsEhIcPZ5cmH9WtS",
+      "id": "2zx3OZLsEhIcPZ5cmH9WtS",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e022a038d3bf875d23e4aeaa84eab67616d00001e02659cd4673230913b3918e0d5ab67616d00001e02700f7bf79c9f063ad0362bdfab67616d00001e0277fdcfda6535601aff081b6a",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e022a038d3bf875d23e4aeaa84eab67616d00001e02659cd4673230913b3918e0d5ab67616d00001e02700f7bf79c9f063ad0362bdfab67616d00001e0277fdcfda6535601aff081b6a",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e022a038d3bf875d23e4aeaa84eab67616d00001e02659cd4673230913b3918e0d5ab67616d00001e02700f7bf79c9f063ad0362bdfab67616d00001e0277fdcfda6535601aff081b6a",
+          "width": 60
+        }
+      ],
+      "name": "White Girl Bangers",
+      "owner": {
+        "display_name": "j.wu1350",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/r8j075ng16rqu6u7olud5uxr8"
+        },
+        "href": "https://api.spotify.com/v1/users/r8j075ng16rqu6u7olud5uxr8",
+        "id": "r8j075ng16rqu6u7olud5uxr8",
+        "type": "user",
+        "uri": "spotify:user:r8j075ng16rqu6u7olud5uxr8"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAFma6oQ3KItCh4sKuQR5GJS546F0L",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2zx3OZLsEhIcPZ5cmH9WtS/tracks",
+        "total": 6
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2zx3OZLsEhIcPZ5cmH9WtS"
+    },
+    {
+      "collaborative": false,
+      "description": "All kinds of music, picked by your own AI DJ.",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/37i9dQZF1EYkqdzj48dyYq"
+      },
+      "href": "https://api.spotify.com/v1/playlists/37i9dQZF1EYkqdzj48dyYq",
+      "id": "37i9dQZF1EYkqdzj48dyYq",
+      "images": [
+        {
+          "height": null,
+          "url": "https://lexicon-assets.spotifycdn.com/DJ-Beta-CoverArt-300.jpg",
+          "width": null
+        }
+      ],
+      "name": "DJ",
+      "owner": {
+        "display_name": "Spotify",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/spotify"
+        },
+        "href": "https://api.spotify.com/v1/users/spotify",
+        "id": "spotify",
+        "type": "user",
+        "uri": "spotify:user:spotify"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAAAAAAACzEDPzO+U0nKHNdhOvJfpi",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/37i9dQZF1EYkqdzj48dyYq/tracks",
+        "total": 0
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:37i9dQZF1EYkqdzj48dyYq"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1Ob3QykC4dzf3rQwWxE9LV"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1Ob3QykC4dzf3rQwWxE9LV",
+      "id": "1Ob3QykC4dzf3rQwWxE9LV",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e020924b9c6232d2348d4efa0dcab67616d00001e02bb09cba8a0ce270c134a59e9ab67616d00001e02e1530b42603367fdb2208d88ab67616d00001e02ec93734d42345154b422c8d5",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e020924b9c6232d2348d4efa0dcab67616d00001e02bb09cba8a0ce270c134a59e9ab67616d00001e02e1530b42603367fdb2208d88ab67616d00001e02ec93734d42345154b422c8d5",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e020924b9c6232d2348d4efa0dcab67616d00001e02bb09cba8a0ce270c134a59e9ab67616d00001e02e1530b42603367fdb2208d88ab67616d00001e02ec93734d42345154b422c8d5",
+          "width": 60
+        }
+      ],
+      "name": "Study \ud83d\udcda",
+      "owner": {
+        "display_name": "j.wu1350",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/r8j075ng16rqu6u7olud5uxr8"
+        },
+        "href": "https://api.spotify.com/v1/users/r8j075ng16rqu6u7olud5uxr8",
+        "id": "r8j075ng16rqu6u7olud5uxr8",
+        "type": "user",
+        "uri": "spotify:user:r8j075ng16rqu6u7olud5uxr8"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAAAglO/YQ5HsJ57Lzn/rOmOHDcqPHrP",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1Ob3QykC4dzf3rQwWxE9LV/tracks",
+        "total": 49
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1Ob3QykC4dzf3rQwWxE9LV"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/6meRpNHvKC1VcBl5MIbVxo"
+      },
+      "href": "https://api.spotify.com/v1/playlists/6meRpNHvKC1VcBl5MIbVxo",
+      "id": "6meRpNHvKC1VcBl5MIbVxo",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d00001e021bfa23b13d0504fb90c37b39ab67616d00001e028dc0d801766a5aa6a33cbe37ab67616d00001e02cd945b4e3de57edd28481a3fab67616d00001e02f907de96b9a4fbc04accc0d5",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d00001e021bfa23b13d0504fb90c37b39ab67616d00001e028dc0d801766a5aa6a33cbe37ab67616d00001e02cd945b4e3de57edd28481a3fab67616d00001e02f907de96b9a4fbc04accc0d5",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d00001e021bfa23b13d0504fb90c37b39ab67616d00001e028dc0d801766a5aa6a33cbe37ab67616d00001e02cd945b4e3de57edd28481a3fab67616d00001e02f907de96b9a4fbc04accc0d5",
+          "width": 60
+        }
+      ],
+      "name": "hehe",
+      "owner": {
+        "display_name": "j.wu1350",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/r8j075ng16rqu6u7olud5uxr8"
+        },
+        "href": "https://api.spotify.com/v1/users/r8j075ng16rqu6u7olud5uxr8",
+        "id": "r8j075ng16rqu6u7olud5uxr8",
+        "type": "user",
+        "uri": "spotify:user:r8j075ng16rqu6u7olud5uxr8"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "AAABnbGe3uTrYFXaYo6t9bpfPKwAvqRE",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/6meRpNHvKC1VcBl5MIbVxo/tracks",
+        "total": 204
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:6meRpNHvKC1VcBl5MIbVxo"
+    }
+  ]
+}

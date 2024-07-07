@@ -12,11 +12,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 load_dotenv('API_keys.env')
 
-with open('Server/user_playlists.json', 'r') as infile:
+with open('user_playlists.json', 'r') as infile:
     playlists = json.load(infile)
 
-for item in playlists['items']:
-    print(item['id'])
+# for item in playlists['items']:
+#     print(item['id'])
 
 # Initialize the Spotify client with OAuth for accessing user library
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ.get('CLIENT_ID'),
@@ -24,13 +24,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ.get('CLIENT_
                                             redirect_uri=os.environ.get('REDIRECT_URI'),
                                             scope="user-library-read"))
 
-df = pd.read_csv('Server/dataset.csv')
-df = df[df.columns[1:]]
-df = df.drop(columns=['time_signature', 'duration_ms'])
 
-pd.set_option('display.max_rows',500)
-pd.set_option('display.max_columns',504)
-pd.set_option('display.width',1000)
 
 def feature_engineer(df):
     scaler = MinMaxScaler()
@@ -69,118 +63,117 @@ def feature_engineer(df):
     df = df.drop(columns=['track_genre'], axis = 'columns')
     return df
 
-#6meRpNHvKC1VcBl5MIbVxo - hehe
-#1Ob3QykC4dzf3rQwWxE9LV - study
-#2dxVgP67xqsTCTfaVed4E0 - test
 
-playlist_id = '6meRpNHvKC1VcBl5MIbVxo'
-playlist_length = sp.playlist_items(playlist_id)['total']
+def generate_recommendation(playlist_id):
+    df = pd.read_csv('Server/dataset.csv')
+    df = df[df.columns[1:]]
+    df = df.drop(columns=['time_signature', 'duration_ms'])
 
-track_ids = []
-date_added = {} #Tracks when a song was added to a playlist
+    playlist_length = sp.playlist_items(playlist_id)['total']
 
-#sp.playlist_track has a limit of 100 items per API call
-for i in range(playlist_length // 100 + 1):
-    playlist = sp.playlist_tracks(playlist_id, market = 'CAN',fields='items', limit=100, offset = i * 100 )
-    #playlist[items] has information on all the tracks in the playlist
-    for index, track in enumerate(playlist['items']):
-        if track['track'] is not None and track['track']['id'] is not None:
-            date_added[track['track']['id']] = playlist['items'][index]['added_at']
-            track_ids.append(track['track']['id'])
-    
+    track_ids = []
+    date_added = {} #Tracks when a song was added to a playlist
 
-artist_genres = {}
+    #sp.playlist_track has a limit of 100 items per API call
+    for i in range(playlist_length // 100 + 1):
+        playlist = sp.playlist_tracks(playlist_id, market = 'CAN',fields='items', limit=100, offset = i * 100 )
+        #playlist[items] has information on all the tracks in the playlist
+        for index, track in enumerate(playlist['items']):
+            if track['track'] is not None and track['track']['id'] is not None:
+                date_added[track['track']['id']] = playlist['items'][index]['added_at']
+                track_ids.append(track['track']['id'])
+        
 
-playlist_track_audio_features = []
+    artist_genres = {}
+    playlist_track_audio_features = []
 
-#
-for i in range(0,len(track_ids), 100):
-    playlist_track_audio_features.extend(sp.audio_features(track_ids[i : i + 100]))
+    #
+    for i in range(0,len(track_ids), 100):
+        playlist_track_audio_features.extend(sp.audio_features(track_ids[i : i + 100]))
 
-playlist_track_info = []
-for i in range(0, len(track_ids), 50):
-    playlist_track_info.extend(sp.tracks(track_ids[i : i + 50])['tracks'])
-
-
-track_audio_features = [audio_feature for audio_feature in playlist_track_audio_features]
-track_info = [info for info in playlist_track_info]
-track_artist_ids = [info['artists'][0]['id'] for info in playlist_track_info]
+    playlist_track_info = []
+    for i in range(0, len(track_ids), 50):
+        playlist_track_info.extend(sp.tracks(track_ids[i : i + 50])['tracks'])
 
 
-for i in range(0, len(track_artist_ids), 50):
-    results = sp.artists(track_artist_ids[i: i + 50])
-    for artist in results['artists']:
-        #Only get the first (main) genre from an artist as artist's have multiple genres
-        artist_genres[artist['name']] = artist_genres.get(artist['name'], artist['genres'][0] if artist['genres'] else None)
-
-for index ,id in enumerate(track_ids):
-    track_artists = [artist['name'] for artist in track_info[index]['artists']]
-    main_artist_genre = artist_genres[track_artists[0]]
-    audio_features_keys = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
-    audio_data = {
-        'track_id': id,
-        'artists': ';'.join(track_artists),
-        'album_name': track_info[index]['album']['name'],
-        'track_name': track_info[index]['name'],
-        'popularity': track_info[index]['popularity'],
-        'explicit': track_info[index]['explicit'],
-        **{key: track_audio_features[index][key] for key in audio_features_keys},
-        'track_genre': main_artist_genre
-    }
-    df.loc[len(df.index)] = audio_data
-
-df = feature_engineer(df)
-
-track_data = df.tail(playlist_length - 1).copy()
-df = df.iloc[:-playlist_length - 1]
-track_data['date_added'] = date_added.values()
-
-# Assuming track_data is already defined and feature_engineered
-track_data = pd.DataFrame(track_data)
-track_data['date_added'] = pd.to_datetime(track_data['date_added']).dt.date
-first_date = track_data.iloc[0]['date_added']
-last_date = track_data.iloc[-1]['date_added']
-
-# Calculate total months difference for normalization
-total_months = relativedelta(last_date, first_date).months + 1
-
-# Calculate weights using linear descent
-weights = []
-for index, row in track_data.iterrows():
-    months_difference = relativedelta(row['date_added'], first_date).months
-    # Linear descent weighting
-    weights.append(round(1/(months_difference + 1), 3))
-
-track_data['weight'] = weights
-track_data = track_data.drop(columns=['date_added'])
+    track_audio_features = [audio_feature for audio_feature in playlist_track_audio_features]
+    track_info = [info for info in playlist_track_info]
+    track_artist_ids = [info['artists'][0]['id'] for info in playlist_track_info]
 
 
-start_index = 0
-end_index = 1
-num_rows = len(track_data.values)
-num_cols = len(track_data.columns)
-results_array = [0] * (num_cols - 5)
-for i in range(num_rows):
-    row = track_data.iloc[i]
-    row_weight = track_data.iloc[i, -1]
-    for index, value in enumerate(row[4:-1]):
-        results_array[index] += value * row_weight
+    for i in range(0, len(track_artist_ids), 50):
+        results = sp.artists(track_artist_ids[i: i + 50])
+        for artist in results['artists']:
+            #Only get the first (main) genre from an artist as artist's have multiple genres
+            artist_genres[artist['name']] = artist_genres.get(artist['name'], artist['genres'][0] if artist['genres'] else None)
+
+    for index ,id in enumerate(track_ids):
+        track_artists = [artist['name'] for artist in track_info[index]['artists']]
+        main_artist_genre = artist_genres[track_artists[0]]
+        audio_features_keys = ['danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+        audio_data = {
+            'track_id': id,
+            'artists': ';'.join(track_artists),
+            'album_name': track_info[index]['album']['name'],
+            'track_name': track_info[index]['name'],
+            'popularity': track_info[index]['popularity'],
+            'explicit': track_info[index]['explicit'],
+            **{key: track_audio_features[index][key] for key in audio_features_keys},
+            'track_genre': main_artist_genre
+        }
+        df.loc[len(df.index)] = audio_data
+
+    df = feature_engineer(df)
+
+    track_data = df.tail(playlist_length - 1).copy()
+    df = df.iloc[:-playlist_length - 1]
+    track_data['date_added'] = date_added.values()
+
+    # Assuming track_data is already defined and feature_engineered
+    track_data = pd.DataFrame(track_data)
+    track_data['date_added'] = pd.to_datetime(track_data['date_added']).dt.date
+    first_date = track_data.iloc[0]['date_added']
+    last_date = track_data.iloc[-1]['date_added']
+
+    # Calculate total months difference for normalization
+    total_months = relativedelta(last_date, first_date).months + 1
+
+    # Calculate weights using linear descent
+    weights = []
+    for index, row in track_data.iterrows():
+        months_difference = relativedelta(row['date_added'], first_date).months
+        # Linear descent weighting
+        weights.append(round(1/(months_difference + 1), 3))
+
+    track_data['weight'] = weights
+    track_data = track_data.drop(columns=['date_added'])
+
+    num_rows = len(track_data.values)
+    num_cols = len(track_data.columns)
+    results_array = [0] * (num_cols - 5)
+    for i in range(num_rows):
+        row = track_data.iloc[i]
+        row_weight = track_data.iloc[i, -1]
+        for index, value in enumerate(row[4:-1]):
+            results_array[index] += value * row_weight
 
 
-vectors = df.iloc[:, 4:].values
-input_vector = np.array(results_array)
-similarity_matrix = cosine_similarity(input_vector.reshape(1,-1), vectors)
+    vectors = df.iloc[:, 4:].values
+    input_vector = np.array(results_array)
+    similarity_matrix = cosine_similarity(input_vector.reshape(1,-1), vectors)
 
-similarity_array = similarity_matrix.flatten()
+    similarity_array = similarity_matrix.flatten()
 
-top_20_songs = set()
-counter = 0
-while len(top_20_songs) < 20:
-    ith_most_similar_index = similarity_array.argsort()[::-1][counter]
-    track_name = df.iloc[ith_most_similar_index]['track_name']
-    artist = df.iloc[ith_most_similar_index]['artists']
-    top_20_songs.add(track_name + " | " + artist)
-    counter += 1
+    top_20_songs = set()
+    counter = 0
+    while len(top_20_songs) < 20:
+        ith_most_similar_index = similarity_array.argsort()[::-1][counter]
+        track_name = df.iloc[ith_most_similar_index]['track_name']
+        artist = df.iloc[ith_most_similar_index]['artists']
+        top_20_songs.add(track_name + " | " + artist)
+        counter += 1
 
-for track in top_20_songs:
-    print(track)
+    for track in top_20_songs:
+        print(track)
+
+generate_recommendation('6meRpNHvKC1VcBl5MIbVxo')

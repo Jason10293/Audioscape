@@ -62,8 +62,9 @@ def callback():
     session['expires_at'] = datetime.now().timestamp() + token_info['expires_in']
 
     
-
-    return redirect('/playlists')
+    frontend_url = "http://localhost:5173"  # Adjust this to your React app's URL
+    redirect_url = f"{frontend_url}?access_token={token_info['access_token']}"
+    return redirect(redirect_url)
 
     
 
@@ -83,7 +84,7 @@ def get_playlists():
     response = requests.get(API_BASE_URL + 'me/playlists', headers=headers)
     playlists = response.json()
 
-    with open('Server/user_playlists.json', 'w') as outfile:
+    with open('user_playlists.json', 'w') as outfile:
         json.dump(playlists, outfile)
 
     return jsonify(playlists)

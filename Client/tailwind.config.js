@@ -7,6 +7,9 @@ export default {
         "spotify-black": "#131313",
         "spotify-green": "#18d860",
       },
+      fontFamily: {
+        roboto: ["Roboto", "sans-serif"],
+      },
     },
   },
   plugins: [],
