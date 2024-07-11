@@ -1,8 +1,17 @@
 import React from "react";
 import playlistData from "../../user_playlists.json";
-import ClickablePlaylistCover from "./assets/ClickablePlaylistCover";
+import ClickablePlaylistCover from "./ClickablePlaylistCover";
+import { useNavigate } from "react-router-dom";
 
-export default function PlaylistSelection() {
+export default function PlaylistSelection({ selectPlaylistOnClick }) {
+  let navigate = useNavigate();
+  const routeChange = () => {
+    navigate("/TrackRecommendationScreen");
+  };
+  const onClick = (index) => {
+    selectPlaylistOnClick(index);
+    routeChange();
+  };
   const playlistCoverArtURLS = playlistData.items
     .filter(
       (playlist) =>
@@ -16,13 +25,18 @@ export default function PlaylistSelection() {
       <header className="text-spotify-green text-4xl mb-10 font-roboto">
         Select a Playlist
       </header>
-      <div className="flex flex-wrap justify-center gap-32 cursor-pointer">
+      <div className="flex flex-wrap justify-center gap-32">
         {playlistCoverArtURLS.map((url, index) => (
           <div
             key={index}
             className="transform transition duration-300 ease-in-out hover:-translate-y-2"
           >
-            <ClickablePlaylistCover playlistCoverArtURL={url} width={200} />
+            <ClickablePlaylistCover
+              index={index}
+              onClick={() => onClick(index)}
+              playlistCoverArtURL={url}
+              width={200}
+            />
           </div>
         ))}
       </div>
