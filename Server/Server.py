@@ -9,7 +9,7 @@ from flask_cors import CORS
 from authlib.integrations.flask_client import OAuth
 import urllib.parse
 import json
-
+from recommendation_engine import generate_recommendations
 load_dotenv('API_keys.env')
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
@@ -19,7 +19,7 @@ API_BASE_URL = 'https://api.spotify.com/v1/'
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 
 @app.route('/')
 def index():
@@ -109,6 +109,12 @@ def refresh_token():
         session['expires_at'] = datetime.now().timestamp() + new_token_info['expires_in']\
         
         return redirect('/playlists')
-    
+
+@app.route('/api/get_track_recommendations/<string:playlist_id>', methods = ['GET'])
+def get_track_recommendations(playlist_id):
+    data = generate_recommendations(playlist_id)
+    return data
+
+
 if __name__ == '__main__':
     app.run(host = '0.0.0.0',debug= True)

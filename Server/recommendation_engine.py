@@ -10,61 +10,62 @@ from dateutil.relativedelta import relativedelta
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-load_dotenv('API_keys.env')
+def generate_recommendations(playlist_id):
+    load_dotenv('API_keys.env')
 
-with open('user_playlists.json', 'r') as infile:
-    playlists = json.load(infile)
+    # with open('user_playlists.json', 'r') as infile:
+    #     playlists = json.load(infile)
 
-# for item in playlists['items']:
-#     print(item['id'])
+    # for item in playlists['items']:
+    #     print(item['id'])
 
-# Initialize the Spotify client with OAuth for accessing user library
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ.get('CLIENT_ID'),
-                                            client_secret=os.environ.get('CLIENT_SECRET'),
-                                            redirect_uri=os.environ.get('REDIRECT_URI'),
-                                            scope="user-library-read"))
+    # Initialize the Spotify client with OAuth for accessing user library
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ.get('CLIENT_ID'),
+                                                client_secret=os.environ.get('CLIENT_SECRET'),
+                                                redirect_uri=os.environ.get('REDIRECT_URI'),
+                                                scope="user-library-read"))
 
 
 
-def feature_engineer(df):
-    scaler = MinMaxScaler()
-    
-    features_to_scale = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
-    features_to_OHE = ['key', 'explicit', 'popularity']
-    
-    tfidf = TfidfVectorizer()
+    def feature_engineer(df):
+        scaler = MinMaxScaler()
+        
+        features_to_scale = ['danceability', 'energy', 'loudness', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence']
+        features_to_OHE = ['key', 'explicit', 'popularity']
+        
+        tfidf = TfidfVectorizer()
 
-    #tfidf cannot handle null values
-    df['track_genre'] = df['track_genre'].ffill()
-    tfidf_matrix = tfidf.fit_transform(df['track_genre'])
-    
-    genre_df = pd.DataFrame(tfidf_matrix.toarray())
-    genre_df.columns = ['genre_' + i for i in tfidf.get_feature_names_out()]
-    # Reset index of genre_df to allow for clean concatenation later
-    genre_df.reset_index(drop = True, inplace=True)
+        #tfidf cannot handle null values
+        df['track_genre'] = df['track_genre'].ffill()
+        tfidf_matrix = tfidf.fit_transform(df['track_genre'])
+        
+        genre_df = pd.DataFrame(tfidf_matrix.toarray())
+        genre_df.columns = ['genre_' + i for i in tfidf.get_feature_names_out()]
+        # Reset index of genre_df to allow for clean concatenation later
+        genre_df.reset_index(drop = True, inplace=True)
 
-    #scale numerical features
-    df[features_to_scale] = scaler.fit_transform(df[features_to_scale])
-    
-    def perform_OHE(df, column):
-        OHE = pd.get_dummies(df[column], drop_first=True, dtype=int, prefix=column)
-        df = df.drop(columns=column, axis='columns')
-        df = pd.concat([df, OHE], axis=1)
+        #scale numerical features
+        df[features_to_scale] = scaler.fit_transform(df[features_to_scale])
+        
+        def perform_OHE(df, column):
+            OHE = pd.get_dummies(df[column], drop_first=True, dtype=int, prefix=column)
+            df = df.drop(columns=column, axis='columns')
+            df = pd.concat([df, OHE], axis=1)
+            return df
+
+        #Seperate popularity into 20 buckets -> OHE the popularity
+        df['popularity'] = df['popularity'].apply(lambda x: x//5)
+
+        for feature in features_to_OHE:
+            df = perform_OHE(df, feature)
+
+        #Combine the main df and the genre_df from the tfidf
+        df = pd.concat([df, genre_df], axis=1)
+        df = df.drop(columns=['track_genre'], axis = 'columns')
         return df
 
-    #Seperate popularity into 20 buckets -> OHE the popularity
-    df['popularity'] = df['popularity'].apply(lambda x: x//5)
-
-    for feature in features_to_OHE:
-        df = perform_OHE(df, feature)
-
-    #Combine the main df and the genre_df from the tfidf
-    df = pd.concat([df, genre_df], axis=1)
-    df = df.drop(columns=['track_genre'], axis = 'columns')
-    return df
 
 
-def generate_recommendation(playlist_id):
     df = pd.read_csv('Server/dataset.csv')
     df = df[df.columns[1:]]
     df = df.drop(columns=['time_signature', 'duration_ms'])
@@ -125,8 +126,9 @@ def generate_recommendation(playlist_id):
 
     df = feature_engineer(df)
 
-    track_data = df.tail(playlist_length - 1).copy()
-    df = df.iloc[:-playlist_length - 1]
+    #Bug here
+    track_data = df.tail(playlist_length).copy()
+    df = df.iloc[:-playlist_length]
     track_data['date_added'] = date_added.values()
 
     # Assuming track_data is already defined and feature_engineered
@@ -176,4 +178,4 @@ def generate_recommendation(playlist_id):
     for track in top_20_songs:
         print(track)
 
-generate_recommendation('6meRpNHvKC1VcBl5MIbVxo')
+generate_recommendations('2zx3OZLsEhIcPZ5cmH9WtS')
