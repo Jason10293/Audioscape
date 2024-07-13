@@ -19,7 +19,7 @@ export default function PlaylistSelection({ selectPlaylistOnClick }) {
         "https://lexicon-assets.spotifycdn.com/DJ-Beta-CoverArt-300.jpg"
     )
     .map((playlist) => playlist.images[0].url);
-
+  console.log(playlistCoverArtURLS);
   return (
     <div className="bg-spotify-black min-h-screen p-10 px-44 flex flex-col items-center justify-center">
       <header className="text-spotify-green text-4xl mb-10 font-roboto">

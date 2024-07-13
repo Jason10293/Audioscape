@@ -7,10 +7,17 @@ import { useState } from "react";
 export default function App() {
   const [playlistId, setPlaylistId] = useState("");
   const selectPlaylistOnClick = (index) => {
-    setPlaylistId(playlistData.items[index].id);
+    setPlaylistId(
+      playlistData.items.filter(
+        (playlist) =>
+          playlist.images[0].url !==
+          "https://lexicon-assets.spotifycdn.com/DJ-Beta-CoverArt-300.jpg"
+      )[index].id
+    );
   };
   return (
     <Router>
+      t
       <Routes>
         <Route path="/" element={<SpotifyAuth />} />
         <Route

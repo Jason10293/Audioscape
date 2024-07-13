@@ -70,24 +70,39 @@ def generate_recommendations(playlist_id):
     df = df[df.columns[1:]]
     df = df.drop(columns=['time_signature', 'duration_ms'])
 
-    playlist_length = sp.playlist_items(playlist_id)['total']
+    playlist_length = 0
+    count = 0
+    playlist_items = []
+    while True:
+        response = sp.playlist_items(playlist_id, offset = 100 * count)
+        tracks = response['items']
+        if not tracks:
+            break
+        playlist_items.extend(tracks)
+        count += 1
+
+    for i in range(len(playlist_items)):
+        if playlist_items[i]['track'] is not None:
+            playlist_length += 1
+    
 
     track_ids = []
     date_added = {} #Tracks when a song was added to a playlist
 
     #sp.playlist_track has a limit of 100 items per API call
-    for i in range(playlist_length // 100 + 1):
-        playlist = sp.playlist_tracks(playlist_id, market = 'CAN',fields='items', limit=100, offset = i * 100 )
+    for i in range(0, playlist_length, 100):
+        playlist = sp.playlist_tracks(playlist_id, market = 'CAN',fields='items', limit=100, offset = i)
         #playlist[items] has information on all the tracks in the playlist
         for index, track in enumerate(playlist['items']):
             if track['track'] is not None and track['track']['id'] is not None:
                 date_added[track['track']['id']] = playlist['items'][index]['added_at']
                 track_ids.append(track['track']['id'])
+            else:
+                print(track['track'])
         
 
     artist_genres = {}
     playlist_track_audio_features = []
-
     #
     for i in range(0,len(track_ids), 100):
         playlist_track_audio_features.extend(sp.audio_features(track_ids[i : i + 100]))
@@ -135,10 +150,6 @@ def generate_recommendations(playlist_id):
     track_data = pd.DataFrame(track_data)
     track_data['date_added'] = pd.to_datetime(track_data['date_added']).dt.date
     first_date = track_data.iloc[0]['date_added']
-    last_date = track_data.iloc[-1]['date_added']
-
-    # Calculate total months difference for normalization
-    total_months = relativedelta(last_date, first_date).months + 1
 
     # Calculate weights using linear descent
     weights = []
